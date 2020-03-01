@@ -7,6 +7,23 @@ var helmet = require('helmet');
 var session = require('express-session');
 var passport = require('passport');
 
+var User = require('./models/user');
+var Schedule = require('./models/schedule');
+var Availability = require('./models/availability');
+var Candidate = require('./models/candidate');
+var Comment = require('./models/comment');
+User.sync().then(() => {
+  Schedule.belongsTo(User, { foreignKey: 'createdBy' });
+  Schedule.sync();
+  Comment.belongsTo(User, { foreignKey: 'userId' });
+  Comment.sync();
+  Availability.belongsTo(User, { foreignKey: 'userId' });
+  Candidate.sync().then(() => {
+    Availability.belongsTo(Candidate, { foreignKey: 'candidateId' });
+    Availability.sync();
+  });
+});
+
 var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = 'e926c7c1f968e028e0f9';
 var GITHUB_CLIENT_SECRET = 'e390c3b28b91674b1ca742e790d77a83cba1651e';
@@ -26,7 +43,12 @@ passport.use(new GitHubStrategy({
 },
   function(accessToken, refreshToken, profile, done) {
     process.nextTick(function() {
-      return done(null, profile);
+      User.upsert({
+        userId: profile.id,
+        username: profile.username
+      }).then(() => {
+        done(null, profile);
+      });
     });
   }
 ));
