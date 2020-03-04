@@ -94,8 +94,6 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
             });
           });
           
-          console.log(availabilityMapMap);
-          
           res.render('schedule', {
             user: req.user,
             schedule: schedule,
