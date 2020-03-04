@@ -107,7 +107,8 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
               schedule: schedule,
               candidates: candidates,
               users: users,
-              availabilityMapMap: availabilityMapMap
+              availabilityMapMap: availabilityMapMap,
+              commentMap: commentMap
             });
           });
         });
